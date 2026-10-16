@@ -53,9 +53,12 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;backgroun
 .brand b{font-family:var(--serif);font-weight:400;font-size:19px}
 .brand span{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:500}
 nav.main{display:flex;gap:4px}
-nav.main a{text-decoration:none;color:var(--ink-2);padding:6px 10px;border-radius:6px;font-weight:500;font-size:15px;white-space:nowrap}
-nav.main a:hover{color:var(--ink);background:var(--paper-2)}
-nav.main a[aria-current="page"]{color:var(--ink);background:var(--paper-2)}
+nav.main button{font:inherit;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;text-decoration:none;color:var(--ink-2);padding:6px 10px;border-radius:6px;font-weight:500;font-size:15px;white-space:nowrap}
+nav.main button:focus-visible{outline:2px solid var(--link);outline-offset:1px}
+.popout{font-size:14px;font-weight:600;color:var(--ink);text-decoration:none;border:1px solid var(--rule-2);background:var(--card);border-radius:8px;padding:7px 12px;white-space:nowrap}
+.popout:hover{border-color:var(--ink-3)}
+nav.main button:hover{color:var(--ink);background:var(--paper-2)}
+nav.main button[aria-current="page"]{color:var(--ink);background:var(--paper-2)}
 .searchbox{position:relative;flex:0 1 300px;min-width:0}
 .searchbox input{width:100%;height:38px;border:1px solid var(--rule-2);background:var(--card);border-radius:8px;padding:0 12px 0 34px;outline:none}
 .searchbox input:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent)}
@@ -278,11 +281,12 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
   <div class="wrap topin">
     <a class="brand" href="#home"><b>The Sutherland Family Collection</b><span>Papers of Col. William Nutt and family</span></a>
     <nav class="main" aria-label="Sections">
-      <a href="#home" data-nav="home">Collection</a>
-      <a href="#index" data-nav="index">Index</a>
-      <a href="#documents" data-nav="documents">Transcriptions</a>
-      <a href="#about" data-nav="about">About</a>
+      <button type="button" data-nav="home">Collection</button>
+      <button type="button" data-nav="index">Index</button>
+      <button type="button" data-nav="documents">Transcriptions</button>
+      <button type="button" data-nav="about">About</button>
     </nav>
+    <a class="popout" id="popout" href="./" target="_blank" rel="noopener" hidden>Open full page</a>
     <div class="searchbox" role="search">
       <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4 4" stroke-linecap="round"/></svg>
       <label class="sr" for="q">Search the collection</label>
@@ -440,7 +444,7 @@ let current = null, viewScroll = {};
 function show(name) {
   Object.entries(views).forEach(([k, v]) => v.hidden = k !== name);
   $('#foot').hidden = name === 'item';
-  $$('nav.main a').forEach(a => {
+  $$('nav.main [data-nav]').forEach(a => {
     const on = a.dataset.nav === name || (name === 'series' && a.dataset.nav === 'home') || (name === 'doc' && a.dataset.nav === 'documents');
     if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
   });
@@ -778,6 +782,17 @@ function go(h, replace) {
   try { history[replace ? 'replaceState' : 'pushState'](null, '', '#' + h); } catch (err) {}
   route();
 }
+$$('nav.main [data-nav]').forEach(b => {
+  const fire = e => { e.preventDefault(); e.stopPropagation(); go(b.dataset.nav); };
+  b.addEventListener('click', fire);
+  b.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') fire(e); });
+});
+(function () {
+  let framed = false;
+  try { framed = window.self !== window.top; } catch (err) { framed = true; }
+  const po = document.getElementById('popout');
+  if (framed && po) { po.href = location.href.split('#')[0]; po.hidden = false; document.documentElement.classList.add('framed'); }
+})();
 window.addEventListener('popstate', () => { HASH = decodeURIComponent(location.hash.slice(1)); route(); });
 document.addEventListener('click', e => {
   if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
