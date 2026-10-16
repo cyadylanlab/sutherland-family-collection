@@ -208,6 +208,11 @@ html,body{width:100%;max-width:100%}body{overflow-x:clip}
   .vbar{position:sticky;top:calc(var(--hh) + env(safe-area-inset-top,0px));z-index:5;background:var(--paper)}
 }
 
+.viewer{height:clamp(460px,calc(100vh - var(--hh) - env(safe-area-inset-top,0px)),900px);height:clamp(460px,calc(100dvh - var(--hh) - env(safe-area-inset-top,0px)),900px)}
+@media (max-width:860px){.viewer{height:auto}.stage{height:clamp(300px,62svh,540px)}}
+/* viewer size caps for tall embeds */
+.viewer{height:min(calc(100vh - var(--hh) - env(safe-area-inset-top,0px)),920px);height:min(calc(100dvh - var(--hh) - env(safe-area-inset-top,0px)),920px)}
+@media (max-width:860px){.viewer{height:auto}.stage{height:min(62vh,125vw,640px);height:min(62svh,125vw,640px)}}
 /* transcription text */
 .tx{font-family:var(--serif);font-size:17.5px;line-height:1.7;color:var(--ink);overflow-wrap:break-word}
 .tx p{margin:0 0 .85em}
