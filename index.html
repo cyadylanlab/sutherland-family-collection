@@ -357,7 +357,7 @@ footer{border-top:1px solid var(--rule);padding-block:20px 24px;color:var(--ink-
 footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-</style>
+.doclayout.notoc{grid-template-columns:minmax(0,1fr)}.docbody,.prose,.panelin,.shead p,.loan p,.hero p.lede,.m55head,.m55santee p,.m55s,.m55fine,.m55tl,.m55note,.m55band p{max-width:none}</style>
 </head>
 <body>
 
@@ -891,7 +891,7 @@ function renderDoc(id, terms) {
     const top = Math.min(...hs.map(h => +h.tagName[1]));
     toc.innerHTML = '<div class="label" style="margin-bottom:8px">Contents</div>' + hs.map((h, i) => { h.id = h.id || ('h' + i); return '<a href="#doc-' + id + '" data-h="' + h.id + '" class="' + (+h.tagName[1] > top ? 'l3' : '') + '">' + esc(h.textContent.trim()) + '</a>'; }).join('');
     $$('a', toc).forEach(a => a.addEventListener('click', e => { e.preventDefault(); const t = document.getElementById(a.dataset.h); if (t) scrollToEl(t, 'start', true); }));
-  } else toc.remove();
+  } else { toc.parentElement.classList.add('notoc'); toc.remove(); }
   if (terms) { const m = markTerms(body, terms); if (m) return m; }
   return null;
 }
